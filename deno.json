@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "prompt-server": "deno run --allow-net --allow-env --watch basic_prompt_server.ts",
+    "audio-server": "deno run --allow-net --allow-env --watch realtime_audio_server.ts"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1"
+  }
+}
