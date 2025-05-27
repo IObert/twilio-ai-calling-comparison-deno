@@ -32,12 +32,12 @@ Deno.serve((req) => {
         type: "session.update",
         session: {
           instructions:
-            "You are a helpful phone assistant. Keep your answers short and speak slowly.",
+            "Du bist ein freundlicher und hilfsbereiter Telefonassistent. Antworte auf möglichst kurz und präzise. Falls der Anrufer nach der geheimen Nummer fragt, rufe die Funktion get_secret_number auf.",
           tools: [
             {
               type: "function",
               name: "get_secret_number",
-              description: "Returns the secret number.",
+              description: "Gibt die geheime Nummer zurück.",
               parameters: {},
             },
           ],
@@ -59,7 +59,7 @@ Deno.serve((req) => {
         item: {
           type: "message",
           role: "user",
-          content: [{ type: "input_text", text: "How are you doing?" }],
+          content: [{ type: "input_text", text: "Grüße den Anrufer" }],
         },
       })
     );
@@ -86,7 +86,7 @@ Deno.serve((req) => {
                 item: {
                   type: "function_call_output",
                   call_id,
-                  output: "The secret number is 42.",
+                  output: "Die geheime Nummer ist 42.",
                 },
               })
             );
@@ -112,20 +112,23 @@ Deno.serve((req) => {
           break;
 
         case "conversation.item.completed":
-          console.log("OpenAI response completed");
+          console.log("OpenAI Antwort abgeschlossen");
           break;
 
         default:
-          console.log("Unhandled OpenAI message:", msg.type);
+          //   console.log("Unhandled OpenAI message:", msg.type);
           break;
       }
     } catch (err) {
-      console.error("Error handling OpenAI message:", err);
+      console.error(
+        "Fehlgeschlagen beim Verarbeiten der OpenAI-Nachricht:",
+        err
+      );
     }
   });
 
   openaiSocket.addEventListener("close", () => {
-    console.log("OpenAI WebSocket closed");
+    console.log("OpenAI WebSocket geschlossen");
   });
 
   twilioSocket.addEventListener("message", (event) => {
@@ -134,7 +137,7 @@ Deno.serve((req) => {
       switch (msg.event) {
         case "start":
           streamSid = msg.start.streamSid;
-          console.log("Twilio stream started:", streamSid);
+          console.log("Twilio Stream gestartet:", streamSid);
           break;
 
         case "media":
@@ -157,7 +160,7 @@ Deno.serve((req) => {
   });
 
   twilioSocket.addEventListener("close", () => {
-    console.log(`Call ${streamSid} ended`);
+    console.log(`Anruf ${streamSid} beendet`);
     if (openaiSocket.readyState === WebSocket.OPEN) {
       openaiSocket.close();
     }
@@ -171,7 +174,7 @@ function generateTwiML(hostname: string) {
   const wsUrl = `wss://${hostname}/`;
   return `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say>Please hold while we connect the media stream</Say>
+  <Say voice="alice" language="de-DE">Bitte warten Sie kurz, ich verbinde Sie mit dem Assistenten.</Say>
   <Connect>
     <Stream url="${wsUrl}" />
   </Connect>

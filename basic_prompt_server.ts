@@ -7,7 +7,7 @@ async function aiResponse(prompt: string) {
     {
       role: "system",
       content:
-        "You are a helpful phone assistant. Keep your answers short and precise. Users may ask for a secret number—provide it if asked. Do not return formatted text.",
+        "Du bist ein freundlicher und hilfsbereiter Telefonassistent. Antworte auf möglichst kurz und präzise. Falls der Anrufer nach der geheimen Nummer fragt, rufe die Funktion get_secret_number auf.",
     },
     { role: "user", content: prompt },
   ];
@@ -16,7 +16,7 @@ async function aiResponse(prompt: string) {
     {
       type: "function",
       name: "get_secret_number",
-      description: "Returns the secret number.",
+      description: "Gibt die geheime Nummer zurück.",
       parameters: {},
     },
   ];
@@ -37,7 +37,7 @@ async function aiResponse(prompt: string) {
       // @ts-ignore type issue in package
       type: "function_call_output",
       call_id: call.call_id,
-      output: "The secret number is 42.",
+      output: "Die geheime Nummer ist 42.",
     });
 
     // @ts-ignore type issue in package
@@ -59,16 +59,16 @@ Deno.serve((req) => {
     const { socket, response } = Deno.upgradeWebSocket(req);
 
     socket.addEventListener("open", () => {
-      console.log("Call received via WebSocket");
+      console.log("Anruf gestartet");
     });
 
     socket.addEventListener("message", async (event) => {
       try {
         const msg = JSON.parse(event.data);
         if (msg.type === "prompt") {
-          console.time(`Request: ${msg.voicePrompt}`);
+          console.time(`KI Anfrage: ${msg.voicePrompt}`);
           const reply = await aiResponse(msg.voicePrompt);
-          console.timeEnd(`Request: ${msg.voicePrompt}`);
+          console.timeEnd(`KI Anfrage: ${msg.voicePrompt}`);
 
           socket.send(
             JSON.stringify({
@@ -78,10 +78,10 @@ Deno.serve((req) => {
             })
           );
         } else {
-          console.log(`Received non-prompt message of type: ${msg.type}`);
+          console.log(`Nicht-prompt Nachricht empfangen: ${msg.type}`);
         }
       } catch (err) {
-        console.error("Error parsing incoming message:", err);
+        console.error("Fehler beim Verarbeiten der Nachricht:", err);
       }
     });
 
@@ -107,8 +107,8 @@ function generateTwiML(hostname: string) {
   <Connect>
     <ConversationRelay 
       url="${wsUrl}"
-      welcomeGreeting="Hi, how can I help you?" 
-      language="en-US"
+      welcomeGreeting="Hallo, ich bin der KI Assistent. Wie kann ich Ihnen helfen?"
+      language="de-DE"
       ttsProvider="ElevenLabs"
       voice="z1EhmmPwF0ENGYE8dBE6"
     />
