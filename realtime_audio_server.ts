@@ -12,7 +12,7 @@ Deno.serve((req) => {
 
   console.log("WebSocket connection established");
 
-  let streamSid: string | null = null;
+  let streamSid: string;
 
   // Connect to OpenAI Realtime API WebSocket
   const openaiSocket = new WebSocket(
