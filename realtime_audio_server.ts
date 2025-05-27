@@ -1,21 +1,5 @@
-// realtime_pipe_server.ts
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
-
-// Helper to generate TwiML with the right WebSocket URL
-function generateTwiML(hostname: string) {
-  const wsUrl = `wss://${hostname}/`;
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say>Please hold while we connect the media stream</Say>
-  <Connect>
-    <Stream url="${wsUrl}" />
-  </Connect>
-  <Pause length="20"/>
-</Response>`;
-}
-
 // Start HTTP/WebSocket server
-serve((req) => {
+Deno.serve((req) => {
   // Root HTTP route returns dynamic TwiML
   if (req.method === "POST" && req.headers.get("upgrade") !== "websocket") {
     const host = req.headers.get("host") ?? "localhost";
@@ -132,7 +116,7 @@ serve((req) => {
           break;
 
         default:
-          // console.log("Unhandled OpenAI message:", msg.type);
+          console.log("Unhandled OpenAI message:", msg.type);
           break;
       }
     } catch (err) {
@@ -173,7 +157,7 @@ serve((req) => {
   });
 
   twilioSocket.addEventListener("close", () => {
-    console.log("Twilio client disconnected");
+    console.log(`Call ${streamSid} ended`);
     if (openaiSocket.readyState === WebSocket.OPEN) {
       openaiSocket.close();
     }
@@ -181,3 +165,16 @@ serve((req) => {
 
   return response;
 });
+
+// Helper to generate TwiML with the right WebSocket URL
+function generateTwiML(hostname: string) {
+  const wsUrl = `wss://${hostname}/`;
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say>Please hold while we connect the media stream</Say>
+  <Connect>
+    <Stream url="${wsUrl}" />
+  </Connect>
+  <Pause length="20"/>
+</Response>`;
+}

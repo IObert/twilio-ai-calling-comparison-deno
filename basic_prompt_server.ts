@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import OpenAI from "npm:openai";
 
 const client = new OpenAI();
@@ -53,7 +52,7 @@ async function aiResponse(prompt: string) {
   return res.output_text;
 }
 
-serve((req) => {
+Deno.serve((req) => {
   const upgrade = req.headers.get("upgrade");
 
   if (upgrade === "websocket") {
@@ -91,9 +90,19 @@ serve((req) => {
 
   // Return TwiML on root route
   const { hostname } = new URL(req.url);
-  const wsUrl = `wss://${hostname}/`;
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+  return new Response(generateTwiML(hostname), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/xml",
+    },
+  });
+});
+
+// Helper to generate TwiML with the right WebSocket URL
+function generateTwiML(hostname: string) {
+  const wsUrl = `wss://${hostname}/`;
+  return `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Connect>
     <ConversationRelay 
@@ -105,11 +114,4 @@ serve((req) => {
     />
   </Connect>
 </Response>`;
-
-  return new Response(xml, {
-    status: 200,
-    headers: {
-      "Content-Type": "application/xml",
-    },
-  });
-});
+}
