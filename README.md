@@ -56,14 +56,12 @@ OPENAI_API_KEY=your-openai-api-key
 ### 3. Run Either Server
 #### Prompt-based (Conversations Relay):
 
-bash
-```
+```bash
 deno run --allow-net --allow-env --watch basic_prompt_server.ts
 ```
 #### Realtime Streaming:
 
-bash
-```
+```bash
 deno run --allow-net --allow-env --watch realtime_audio_server.ts
 ```
 
@@ -71,8 +69,7 @@ deno run --allow-net --allow-env --watch realtime_audio_server.ts
 ### 4. Expose Your Server
 To connect Twilio with your local WebSocket server, expose port 8000 to the internet using ngrok:
 
-bash
-```
+```bash
 ngrok http 8000
 ```
 ### 5. Connect Twilio to Your Server
